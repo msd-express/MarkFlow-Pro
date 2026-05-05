@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0a0a0f">
+    <meta name="description" content="MarkFlow Pro — профессиональный Markdown редактор с AI-помощником и голосовым вводом">
+    <title>MarkFlow Pro v7.2 — FINAL</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js">
+    </script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.0/dist/purify.min.js">
+    </script>
+
+    <style>
+        :root {
+            --bg-deep: #0a0a0f;
+            --bg-primary: #14141f;
+            --bg-secondary: #1a1a2a;
+            --bg-elevated: #22223b;
+            --border: #2d2d44;
+            --text: #e8e8f0;
+            --text-dim: #8a8aa8;
+            --accent: #7c3aed;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+            --scrollbar-thumb: #3d3d5c;
+            --scrollbar-track: #1a1a2a;
+        }
+
+        [data-theme="light"] {
+            --bg-deep: #f5f5fa;
+            --bg-primary: #ffffff;
+            --bg-secondary: #fafafe;
+            --bg-elevated: #eeeef5;
+            --border: #d4d4e0;
+            --text: #1a1a2e;
+            --text-dim: #6b6b85;
+            --scrollbar-thumb: #c4c4d4;
+            --scrollbar-track: #eeeef5;
+        }
+
+        [data-theme="sepia"] {
+            --bg-deep: #f4ecd8;
+            --bg-primary: #f8f0e0;
+            --bg-secondary: #faf4e8;
+            --bg-elevated: #e8dcc8;
+            --border: #d4c4a0;
+            --text: #5b4636;
+            --text-dim: #8b7355;
+            --accent: #8b5e3c;
+            --success: #6b8e5a;
+            --danger: #c44b4b;
+            --warning: #c4820e;
+            --scrollbar-thumb: #c4b89c;
+            --scrollbar-track: #f0e8d4;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        *::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        *::-webkit-scrollbar-track {
+            background: var(--scrollbar-track);
+        }
+        *::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+        *::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .header {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            flex-wrap: wrap;
+            z-index: 100;
+        }
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        [data-theme="sepia"] .logo {
+            background: linear-gradient(135deg, #8b5e3c, #c4820e);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .btn {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 6px 12px;
+            color: var(--text);
+            cursor: pointer;
+            font-size: 13px;
+            white-space: nowrap;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+        .btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            border: none;
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+            border: none;
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            border: none;
+        }
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 11px;
+        }
+        .btn-voice {
+            background: var(--warning);
+            color: #000;
+            border: none;
+            animation: pulse 1.2s infinite;
+        }
+        @keyframes pulse {
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+            }
+        }
+
+        .file-input {
+            flex: 1;
+            min-width: 120px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            outline: none;
+        }
+
+        .workspace {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+            min-height: 0;
+        }
+        @media (max-width: 768px) {
+            .workspace {
+                flex-direction: column;
+            }
+            .ai-panel {
+                width: 100% !important;
+                max-height: 200px;
+            }
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            min-width: 0;
+        }
+        .panel:first-child {
+            border-right: 1px solid var(--border);
+        }
+        .panel-header {
+            background: var(--bg-primary);
+            padding: 8px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+        .scroll-area {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+        .editor-area {
+            width: 100%;
+            min-height: 100%;
+            background: var(--bg-secondary);
+            border: none;
+            color: var(--text);
+            font-family: var(--font-mono);
+            font-size: 14px;
+            line-height: 1.7;
+            padding: 20px;
+            resize: none;
+            outline: none;
+            tab-size: 4;
+        }
+        .preview-area {
+            padding: 20px;
+            line-height: 1.7;
+        }
+        .preview-area h1,
+        .preview-area h2,
+        .preview-area h3 {
+            border-left: 3px solid var(--accent);
+            padding-left: 12px;
+            margin: 16px 0 8px;
+        }
+        .preview-area code {
+            background: var(--bg-elevated);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--warning);
+        }
+        .preview-area pre {
+            background: var(--bg-elevated);
+            padding: 14px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+        .preview-area table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 12px 0;
+        }
+        .preview-area th,
+        .preview-area td {
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+        }
+        .preview-area th {
+            background: var(--bg-primary);
+        }
+        .preview-area blockquote {
+            border-left: 3px solid var(--accent);
+            padding-left: 16px;
+            color: var(--text-dim);
+        }
+        .preview-area img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+
+        .ai-panel {
+            width: 320px;
+            background: var(--bg-primary);
+            border-left: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            flex-shrink: 0;
+            padding: 12px;
+            gap: 8px;
+        }
+        .ai-section {
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            padding: 10px;
+        }
+        .ai-section h4 {
+            font-size: 12px;
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-bar {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border);
+            padding: 4px 16px;
+            display: flex;
+            gap: 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+            flex-shrink: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .modal.show {
+            display: flex;
+        }
+        .modal-card {
+            background: var(--bg-elevated);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .toolbar {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 6px 12px;
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+            flex-shrink: 0;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+        .tool-group {
+            display: flex;
+            gap: 2px;
+            background: var(--bg-elevated);
+            border-radius: 8px;
+            padding: 2px;
+        }
+        .tool-btn {
+            background: transparent;
+            border: none;
+            padding: 6px 10px;
+            border-radius: 6px;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s;
+        }
+        .tool-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+
+        .search-bar {
+            display: none;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border);
+            padding: 8px 16px;
+            gap: 8px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .search-bar.active {
+            display: flex;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-elevated);
+            border-left: 3px solid var(--success);
+            padding: 12px 20px;
+            border-radius: 12px;
+            z-index: 2000;
+            animation: slideUp 0.3s ease-out;
+        }
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        input[type="range"] {
+            accent-color: var(--accent);
+        }
+        input[type="text"],
+        input[type="search"] {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            width: 100%;
+        }
+
+        .template-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .template-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-size: 12px;
+        }
+        .template-card:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        details {
+            margin-bottom: 8px;
+        }
+        details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--accent);
+            padding: 4px 0;
+        }
+
+        .theme-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 4px;
+        }
+        .theme-sepia {
+            background: #f4ecd8;
+            color: #5b4636;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <span class="logo">✍️ MarkFlow Pro</span>
+        <span style="font-size:10px; background:var(--warning); padding:2px 8px; border-radius:20px; color:#000;">v7.2 FINAL</span>
+        <input type="text" id="fileName" class="file-input" value="document.md">
+        <button class="btn" id="newBtn" title="Новый (Ctrl+N)">📄</button>
+        <button class="btn" id="openBtn" title="Открыть (Ctrl+O)">📂</button>
+        <button class="btn btn-success" id="saveBtn" title="Сохранить (Ctrl+S)">💾</button>
+        <button class="btn" id="undoBtn" title="Отменить (Ctrl+Z)">↩️</button>
+        <button class="btn" id="redoBtn" title="Повторить (Ctrl+Y)">↪️</button>
+        <button class="btn" id="searchBtn" title="Поиск (Ctrl+F)">🔍</button>
+        <button class="btn" id="voiceBtn" title="Голосовой ввод">🎤</button>
+        <button class="btn" id="templatesBtn" title="Шаблоны">📋</button>
+        <button class="btn" id="aiSettingsBtn" title="AI настройки">⚡</button>
+        <button class="btn" id="themeBtn" title="Тема (тёмная/светлая/сепия)">🎨</button>
+        <button class="btn btn-primary" id="menuBtn" title="Меню">☰</button>
+    </div>
+
+    <div class="search-bar" id="searchBar">
+        <input type="text" id="searchInput" placeholder="Поиск...">
+        <span id="searchCount" style="font-size:12px; color:var(--text-dim);"></span>
+        <button class="btn btn-sm" id="searchPrevBtn">▲</button>
+        <button class="btn btn-sm" id="searchNextBtn">▼</button>
+        <button class="btn btn-sm btn-danger" id="searchCloseBtn">✕</button>
+    </div>
+
+    <div class="toolbar" id="mdToolbar">
+        <div class="tool-group">
+            <button class="tool-btn" data-md="bold"><b>B</b></button>
+            <button class="tool-btn" data-md="italic"><i>I</i></button>
+            <button class="tool-btn" data-md="underline"><u>U</u></button>
+            <button class="tool-btn" data-md="strike"><s>S</s></button>
+        </div>
+        <div class="tool-group">
+            <button class="tool-btn" data-md="h1">H1</button>
+            <button class="tool-btn" data-md="h2">H2</button>
+            <button class="tool-btn" data-md="h3">H3</button>
+        </div>
+        <div class="tool-group">
+            <button class="tool-btn" data-md="ul">•</button>
+            <button class="tool-btn" data-md="ol">1.</button>
+            <button class="tool-btn" data-md="task">☐</button>
+        </div>
+        <div class="tool-group">
+            <button class="tool-btn" data-md="link">🔗</button>
+            <button class="tool-btn" data-md="image">🖼️</button>
+            <button class="tool-btn" data-md="code">&lt;/&gt;</button>
+            <button class="tool-btn" data-md="quote">"</button>
+        </div>
+        <div class="tool-group">
+            <button class="tool-btn" data-md="table">⊞</button>
+            <button class="tool-btn" data-md="hr">—</button>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="panel">
+            <div class="panel-header">📝 Редактор</div>
+            <div class="scroll-area" id="editorScroll">
+                <textarea id="editor" class="editor-area" placeholder="Начните писать..."></textarea>
+            </div>
+            <div class="status-bar">
+                <span>📝 <b id="charCount">0</b></span>
+                <span>📄 <b id="wordCount">0</b></span>
+                <span>📏 <b id="lineCount">0</b></span>
+                <span>⏱️ <b id="readTime">0</b></span>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">👁️ Предпросмотр</div>
+            <div class="scroll-area" id="previewScroll">
+                <div class="preview-area" id="preview"></div>
+            </div>
+        </div>
+        <div class="ai-panel" id="aiPanel">
+            <div class="ai-section">
+                <h4>🤖 AI Помощник (DeepSeek)</h4>
+                <p style="font-size:11px; color:var(--text-dim); margin-bottom:8px;">
+                    <span id="apiKeyStatus">⚡ API ключ не задан</span>
+                </p>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                    <button class="btn btn-sm" onclick="aiCheckSpelling()">🔍 Проверить орфографию</button>
+                    <button class="btn btn-sm" onclick="aiTranslate('en')">🌐 Перевести на английский</button>
+                    <button class="btn btn-sm" onclick="aiTranslate('ru')">🌐 Перевести на русский</button>
+                    <button class="btn btn-sm" onclick="aiSummarize()">📝 Суммаризировать</button>
+                    <button class="btn btn-sm" onclick="aiImproveText()">✨ Улучшить стиль</button>
+                    <button class="btn btn-sm" onclick="aiGenerateSQL()">📊 Текст в SQL</button>
+                    <button class="btn btn-sm" onclick="aiGenerateRegex()">🎯 Текст в RegEx</button>
+                    <button class="btn btn-sm" onclick="aiExplainCode()">💡 Объяснить код</button>
+                    <button class="btn btn-sm" onclick="aiFixCode()">🔧 Исправить код</button>
+                </div>
+            </div>
+            <div class="ai-section">
+                <h4>📋 Сниппеты</h4>
+                <div style="display:flex; flex-wrap:wrap; gap:4px;">
+                    <button class="btn btn-sm" onclick="insertSnippet('alert')">⚠️ Важно</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('info')">ℹ️ Инфо</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('tip')">💡 Совет</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('warning')">🔴 Предупр.</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('check')">✅ Задача</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('code')">💻 Код</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('link')">🔗 Ссылка</button>
+                    <button class="btn btn-sm" onclick="insertSnippet('img')">🖼️ Изобр.</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="templatesModal" class="modal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3>📋 Шаблоны</h3>
+                <button style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer;" onclick="document.getElementById('templatesModal').classList.remove('show')">✕</button>
+            </div>
+            <div class="template-grid" id="templateGrid"></div>
+        </div>
+    </div>
+
+    <div id="aiSettingsModal" class="modal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3>⚡ AI Настройки (DeepSeek)</h3>
+                <button style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer;" onclick="document.getElementById('aiSettingsModal').classList.remove('show')">✕</button>
+            </div>
+            <p style="font-size:12px; color:var(--text-dim); margin-bottom:8px;">Вставьте ваш API ключ DeepSeek. <a href="https://platform.deepseek.com/api_keys" target="_blank" style="color:var(--accent);">Получить ключ</a></p>
+            <input type="text" id="deepseekApiKey" placeholder="sk-...">
+            <div style="display:flex; gap:8px; margin-top:12px;">
+                <button class="btn btn-success btn-sm" onclick="saveApiKey()">💾 Сохранить</button>
+                <button class="btn btn-danger btn-sm" onclick="clearApiKey()">🗑️ Удалить</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="menuModal" class="modal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h3>📥 Экспорт</h3>
+                <button style="background:none; border:none; color:var(--text-dim); font-size:24px; cursor:pointer;" onclick="document.getElementById('menuModal').classList.remove('show')">✕</button>
+            </div>
+            <button class="btn" style="width:100%;margin:4px 0;" onclick="exportDoc('pdf')">📕 PDF (печать)</button>
+            <button class="btn" style="width:100%;margin:4px 0;" onclick="exportDoc('excel')">📗 CSV</button>
+            <button class="btn" style="width:100%;margin:4px 0;" onclick="exportDoc('html')">🌐 HTML файл</button>
+            <button class="btn" style="width:100%;margin:4px 0;" onclick="exportDoc('copy-html')">📝 Копировать HTML</button>
+            <button class="btn" style="width:100%;margin:4px 0;" onclick="exportDoc('copy-md')">📄 Копировать MD</button>
+        </div>
+    </div>
+
+    <input type="file" id="fileOpener" accept=".md,.txt,.html" style="display:none;">
+
+    <script>
+        const state = {
+            theme: localStorage.getItem('mf_theme') || 'dark',
+            syncScroll: true,
+            undoStack: [],
+            redoStack: [],
+            lastEditTime: 0,
+            scrollLock: false,
+            showAiPanel: true,
+            deepseekApiKey: localStorage.getItem('mf_deepseek_key') || ''
+        };
+
+        const $ = id => document.getElementById(id);
+        const editor = $('editor');
+        const preview = $('preview');
+        const editorScroll = $('editorScroll');
+        const previewScroll = $('previewScroll');
+
+        if (typeof marked !== 'undefined') {
+            marked.setOptions({ gfm: true, breaks: true, tables: true, pedantic: false, sanitize: false,
+                smartLists: true, smartypants: true });
+        }
+
+        const templates = {
+            '📄 Статья': '# Заголовок\n\n## Введение\n\nТекст...\n\n## Основная часть\n\nТекст...\n\n## Заключение\n\nИтоги...',
+            '📊 Отчёт': '# Отчёт\n\n| Метрика | Значение |\n|---------|----------|\n| Продажи | 100 000 |',
+            '✉️ Письмо': '**Кому:** \n**Тема:** \n\nУважаемый(ая) ...,\n\nТекст...\n\nС уважением,',
+            '📝 TODO': '# Задачи\n\n- [ ] Срочно\n- [ ] Важно\n- [ ] Можно отложить',
+            '📖 Документация': '# Проект\n\n## Установка\n\n```bash\nnpm install\n```\n\n## API\n\n| Метод | URL |\n|-------|-----|\n| GET | /api |',
+            '🐛 Баг-репорт': '# Баг\n\n**Шаги:**\n1. \n2. \n\n**Результат:** \n**Ожидание:**',
+            '📋 Чек-лист': '# Чек-лист\n\n- [ ] Пункт 1\n- [ ] Пункт 2'
+        };
+
+        const snippets = {
+            'alert': '> ⚠️ **Внимание:** ',
+            'info': '> ℹ️ **Информация:** ',
+            'tip': '> 💡 **Совет:** ',
+            'warning': '> 🔴 **Предупреждение:** ',
+            'check': '- [x] ',
+            'code': '```\n\n```',
+            'link': '[текст](url)',
+            'img': '![alt](url)'
+        };
+
+        function render() {
+            const content = editor.value || '';
+            let html = content;
+
+            if (typeof marked !== 'undefined') {
+                try { html = marked.parse(content); } catch (e) {}
+            }
+
+            if (typeof DOMPurify !== 'undefined') {
+                html = DOMPurify.sanitize(html, { ADD_TAGS: ['details', 'summary'],
+                    ADD_ATTR: ['style', 'class', 'onclick', 'target', 'open'] });
+            }
+
+            preview.innerHTML = html;
+            if (typeof hljs !== 'undefined') {
+                preview.querySelectorAll('pre code').forEach(b => hljs.highlightElement(b));
+            }
+            updateStats();
+            localStorage.setItem('mf_draft', editor.value);
+        }
+
+        function updateStats() {
+            const text = editor.value;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            $('charCount').textContent = text.length.toLocaleString();
+            $('wordCount').textContent = words.toLocaleString();
+            $('lineCount').textContent = text.split('\n').length.toLocaleString();
+            $('readTime').textContent = Math.max(1, Math.ceil(words / 200)) + ' мин';
+        }
+
+        function insertText(text) {
+            const s = editor.selectionStart,
+                e = editor.selectionEnd;
+            editor.value = editor.value.substring(0, s) + text + editor.value.substring(e);
+            editor.selectionStart = editor.selectionEnd = s + text.length;
+            editor.focus();
+            pushUndo();
+            render();
+        }
+
+        function insertAround(before, after, placeholder = '') {
+            const s = editor.selectionStart,
+                e = editor.selectionEnd;
+            const sel = editor.value.substring(s, e) || placeholder;
+            editor.value = editor.value.substring(0, s) + before + sel + after + editor.value.substring(e);
+            editor.selectionStart = editor.selectionEnd = s + before.length + sel.length;
+            editor.focus();
+            pushUndo();
+            render();
+        }
+
+        function insertLinePrefix(prefix) {
+            let s = editor.selectionStart;
+            while (s > 0 && editor.value[s - 1] !== '\n') s--;
+            editor.value = editor.value.substring(0, s) + prefix + editor.value.substring(s);
+            editor.selectionStart = editor.selectionEnd = s + prefix.length;
+            editor.focus();
+            pushUndo();
+            render();
+        }
+
+        function insertSnippet(name) {
+            if (snippets[name]) insertText(snippets[name]);
+        }
+
+        function pushUndo() {
+            const t = editor.value;
+            if (state.undoStack.length && state.undoStack[state.undoStack.length - 1] === t) return;
+            state.undoStack.push(t);
+            if (state.undoStack.length > 100) state.undoStack.shift();
+            state.redoStack = [];
+        }
+
+        function undo() {
+            if (state.undoStack.length < 2) return;
+            state.redoStack.push(state.undoStack.pop());
+            editor.value = state.undoStack[state.undoStack.length - 1];
+            render();
+        }
+
+        function redo() {
+            if (!state.redoStack.length) return;
+            state.undoStack.push(state.redoStack.pop());
+            editor.value = state.undoStack[state.undoStack.length - 1];
+            render();
+        }
+
+        function syncScroll(source, target) {
+            if (!state.syncScroll) return;
+            if (state.scrollLock) return;
+
+            state.scrollLock = true;
+            const sourceMax = source.scrollHeight - source.clientHeight;
+            const targetMax = target.scrollHeight - target.clientHeight;
+
+            if (sourceMax <= 0 || targetMax <= 0) {
+                state.scrollLock = false;
+                return;
+            }
+
+            const pct = source.scrollTop / sourceMax;
+            target.scrollTop = pct * targetMax;
+
+            const unlock = () => {
+                state.scrollLock = false;
+                target.removeEventListener('scroll', unlock);
+            };
+            target.addEventListener('scroll', unlock, { once: true });
+
+            setTimeout(() => {
+                if (state.scrollLock) {
+                    state.scrollLock = false;
+                    target.removeEventListener('scroll', unlock);
+                }
+            }, 150);
+        }
+
+        function setTheme(theme) {
+            state.theme = theme;
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('mf_theme', theme);
+            $('themeBtn').textContent = theme === 'dark' ? '🌙' : theme === 'sepia' ? '🏜️' : '☀️';
+        }
+
+        let recognition = null;
+        let isListening = false;
+
+        function getRecognition() {
+            if (!recognition) {
+                const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SR();
+                recognition.lang = 'ru-RU';
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+            }
+            return recognition;
+        }
+
+        function startVoice() {
+            if (isListening) return;
+            const rec = getRecognition();
+            rec.onresult = (e) => {
+                const t = e.results[0][0].transcript.trim();
+                if (t) insertText(t);
+            };
+            rec.onerror = () => { isListening = false;
+                $('voiceBtn').classList.remove('btn-voice'); };
+            rec.onend = () => { isListening = false;
+                $('voiceBtn').classList.remove('btn-voice'); };
+            try {
+                rec.start();
+                isListening = true;
+                $('voiceBtn').classList.add('btn-voice');
+                showToast('🎤 Говорите...');
+            } catch (ex) {
+                recognition = null;
+                isListening = false;
+                showToast('Ошибка микрофона', 'error');
+            }
+        }
+
+        function stopVoice() {
+            if (!isListening) return;
+            try { recognition.stop(); } catch (e) {}
+            isListening = false;
+            $('voiceBtn').classList.remove('btn-voice');
+        }
+
+        async function callDeepSeek(systemPrompt, userText) {
+            if (!state.deepseekApiKey) {
+                showToast('⚡ Нужен API ключ DeepSeek', 'error');
+                $('aiSettingsModal').classList.add('show');
+                return null;
+            }
+            try {
+                const resp = await fetch('https://api.deepseek.com/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + state.deepseekApiKey
+                    },
+                    body: JSON.stringify({
+                        model: 'deepseek-chat',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            { role: 'user', content: userText }
+                        ],
+                        temperature: 0.3
+                    })
+                });
+                const data = await resp.json();
+                return data.choices?.[0]?.message?.content || null;
+            } catch (e) {
+                showToast('Ошибка API', 'error');
+                return null;
+            }
+        }
+
+        async function aiCheckSpelling() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd) || editor.value;
+            if (!text.trim()) return showToast('Нет текста', 'error');
+            showToast('🔍 Проверяем...');
+            const result = await callDeepSeek('Проверь орфографию и пунктуацию. Перечисли найденные ошибки и исправления.',
+                text);
+            if (result) {
+                insertText('\n> **Проверка:**\n> ' + result.replace(/\n/g, '\n> '));
+                showToast('✅ Готово');
+            }
+        }
+
+        async function aiTranslate(target) {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Выделите текст', 'error');
+            const lang = target === 'en' ? 'английский' : target === 'ru' ? 'русский' : target;
+            showToast('🌐 Переводим...');
+            const result = await callDeepSeek('Переведи на ' + lang + '. Только перевод.', text);
+            if (result) { insertText(result.trim());
+                showToast('✅ Переведено'); }
+        }
+
+        async function aiSummarize() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Выделите текст', 'error');
+            showToast('📝 Суммаризируем...');
+            const result = await callDeepSeek('Сделай краткое содержание. 3-5 предложений.', text);
+            if (result) {
+                insertText('\n> **Краткое содержание:** ' + result.replace(/\n/g, ' '));
+                showToast('✅ Готово');
+            }
+        }
+
+        async function aiImproveText() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Выделите текст', 'error');
+            showToast('✨ Улучшаем...');
+            const result = await callDeepSeek('Улучши стиль текста. Сохрани смысл.', text);
+            if (result) { insertText(result.trim());
+                showToast('✅ Готово'); }
+        }
+
+        async function aiGenerateSQL() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Опишите запрос', 'error');
+            showToast('📊 Генерируем SQL...');
+            const result = await callDeepSeek('Сгенерируй SQL запрос на основе описания. Только код.', text);
+            if (result) {
+                insertText('\n```sql\n' + result.replace(/```/g, '') + '\n```\n');
+                showToast('✅ Готово');
+            }
+        }
+
+        async function aiGenerateRegex() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Опишите шаблон', 'error');
+            showToast('🎯 Генерируем RegEx...');
+            const result = await callDeepSeek('Сгенерируй регулярное выражение. Только код.', text);
+            if (result) {
+                insertText('\n```regex\n' + result.replace(/```/g, '') + '\n```\n');
+                showToast('✅ Готово');
+            }
+        }
+
+        async function aiExplainCode() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Выделите код', 'error');
+            showToast('💡 Объясняем...');
+            const result = await callDeepSeek('Объясни этот код простыми словами.', text);
+            if (result) {
+                insertText('\n> **Объяснение:** ' + result.replace(/\n/g, '\n> '));
+                showToast('✅ Готово');
+            }
+        }
+
+        async function aiFixCode() {
+            const text = editor.value.substring(editor.selectionStart, editor.selectionEnd);
+            if (!text.trim()) return showToast('Выделите код', 'error');
+            showToast('🔧 Исправляем...');
+            const result = await callDeepSeek('Исправь ошибки в коде. Верни исправленный код.', text);
+            if (result) { insertText(result.replace(/```/g, ''));
+                showToast('✅ Готово'); }
+        }
+
+        function saveApiKey() {
+            const key = $('deepseekApiKey').value.trim();
+            if (key) {
+                state.deepseekApiKey = key;
+                localStorage.setItem('mf_deepseek_key', key);
+                updateApiKeyStatus();
+                $('aiSettingsModal').classList.remove('show');
+                showToast('🔑 Ключ сохранён');
+            }
+        }
+
+        function clearApiKey() {
+            state.deepseekApiKey = '';
+            localStorage.removeItem('mf_deepseek_key');
+            $('deepseekApiKey').value = '';
+            updateApiKeyStatus();
+            showToast('🗑️ Ключ удалён');
+        }
+
+        function updateApiKeyStatus() {
+            const el = $('apiKeyStatus');
+            if (state.deepseekApiKey) {
+                el.textContent = '✅ DeepSeek подключён';
+                el.style.color = 'var(--success)';
+            } else {
+                el.textContent = '⚡ API ключ не задан';
+                el.style.color = 'var(--text-dim)';
+            }
+        }
+
+        function exportDoc(type) {
+            const name = $('fileName').value.replace(/\.[^.]*$/, '');
+            switch (type) {
+                case 'copy-html':
+                    navigator.clipboard.writeText(preview.innerHTML).then(() => showToast('✅ HTML скопирован'));
+                    break;
+                case 'copy-md':
+                    navigator.clipboard.writeText(editor.value).then(() => showToast('✅ MD скопирован'));
+                    break;
+                case 'excel':
+                    const csv = '\uFEFF' + editor.value.split('\n').map(r => r.split(',').map(c => '"' + c.replace(
+                        /"/g, '""') + '"').join(',')).join('\n');
+                    downloadFile(name + '.csv', csv, 'text/csv');
+                    showToast('📊 CSV создан');
+                    break;
+                case 'html':
+                    downloadFile(name + '.html',
+                        '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + name +
+                        '</title></head><body>' + preview.innerHTML + '</body></html>', 'text/html');
+                    showToast('🌐 HTML создан');
+                    break;
+                case 'pdf':
+                    const w = window.open('', '_blank');
+                    w.document.write(
+                        '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>' + name +
+                        '</title><style>body{font-family:sans-serif;padding:20px;max-width:800px;margin:0 auto;} table{border-collapse:collapse;width:100%;} th,td{border:1px solid #ccc;padding:8px;} th{background:#f5f5f5;} pre{background:#f5f5f5;padding:10px;border-radius:8px;} blockquote{border-left:3px solid #7c3aed;padding-left:16px;color:#666;} @media print{body{padding:0;}}</style></head><body>' +
+                        preview.innerHTML + '</body></html>');
+                    w.document.close();
+                    setTimeout(() => w.print(), 500);
+                    break;
+            }
+            $('menuModal').classList.remove('show');
+        }
+
+        function downloadFile(name, content, type) {
+            const b = new Blob([content], { type });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(b);
+            a.download = name;
+            a.click();
+            URL.revokeObjectURL(a.href);
+        }
+
+        function showToast(msg, type = '') {
+            const old = document.querySelector('.toast');
+            if (old) old.remove();
+            const t = document.createElement('div');
+            t.className = 'toast ' + type;
+            t.textContent = msg;
+            document.body.appendChild(t);
+            setTimeout(() => { t.style.opacity = '0';
+                t.style.transition = '0.3s';
+                setTimeout(() => t.remove(), 300); }, 2500);
+        }
+
+        function renderTemplates() {
+            $('templateGrid').innerHTML = Object.entries(templates).map(([name, content]) =>
+                `<div class="template-card" onclick="editor.value=\`${content.replace(/`/g,'\\`')}\`;pushUndo();render();$('templatesModal').classList.remove('show');showToast('📄 Шаблон загружен')">
+                    <div style="font-size:24px;margin-bottom:4px;">${name.slice(0,2)}</div>
+                    <div>${name}</div>
+                </div>`
+            ).join('');
+        }
+
+        function showGuide() {
+            const m = document.createElement('div');
+            m.className = 'modal show';
+            m.innerHTML = `<div class="modal-card" style="max-height:80vh;overflow-y:auto;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+                    <h3>📖 Руководство v7.2</h3>
+                    <button style="background:none;border:none;color:var(--text-dim);font-size:24px;cursor:pointer;">✕</button>
+                </div>
+                <details open><summary>🎯 Горячие клавиши</summary>
+                    <table style="width:100%;font-size:12px;">
+                        <tr><td><b>Ctrl+B</b></td><td>Жирный</td><td><b>Ctrl+I</b></td><td>Курсив</td></tr>
+                        <tr><td><b>Ctrl+K</b></td><td>Ссылка</td><td><b>Ctrl+S</b></td><td>Сохранить</td></tr>
+                        <tr><td><b>Ctrl+Z</b></td><td>Отменить</td><td><b>Ctrl+Y</b></td><td>Повторить</td></tr>
+                        <tr><td><b>Ctrl+F</b></td><td>Поиск</td><td><b>F1</b></td><td>Справка</td></tr>
+                        <tr><td><b>Ctrl+N</b></td><td>Новый</td><td><b>Ctrl+O</b></td><td>Открыть</td></tr>
+                    </table>
+                </details>
+                <details><summary>🎤 Голосовой ввод (новое!)</summary>
+                    <p style="font-size:12px;">Кнопка 🎤 — голосовой ввод без дублей. Работает как рация: нажмите и говорите.</p>
+                </details>
+                <details><summary>🤖 AI Помощник (DeepSeek)</summary>
+                    <p style="font-size:12px;">⚡ Настройки → вставьте API ключ DeepSeek. Все функции работают через DeepSeek API.</p>
+                </details>
+                <details><summary>🎨 Темы (новое!)</summary>
+                    <p style="font-size:12px;">🌙 Тёмная · ☀️ Светлая · <span class="theme-badge theme-sepia">🏜️ Сепия</span> (новая!)</p>
+                </details>
+                <details><summary>🔄 Синхронный скролл (исправлено!)</summary>
+                    <p style="font-size:12px;">Исправлен баг с зависанием scrollLock. Скролл работает плавно и не блокируется.</p>
+                </details>
+            </div>`;
+            document.body.appendChild(m);
+            const close = () => { m.style.opacity = '0';
+                m.style.transition = '0.2s';
+                setTimeout(() => m.remove(), 200); };
+            m.querySelector('button').onclick = close;
+            m.onclick = e => { if (e.target === m) close(); };
+        }
+
+        function init() {
+            setTheme(state.theme);
+            updateApiKeyStatus();
+
+            editor.addEventListener('input', () => { pushUndo();
+                render(); });
+            editor.addEventListener('keydown', e => { if (e.key === 'Tab' && !e.ctrlKey) { e.preventDefault();
+                    insertText('    '); } });
+            editor.addEventListener('scroll', () => syncScroll(editorScroll, previewScroll));
+            previewScroll.addEventListener('scroll', () => syncScroll(previewScroll, editorScroll));
+            editor.addEventListener('paste', e => {
+                const items = e.clipboardData?.items;
+                for (const item of items) {
+                    if (item.type.startsWith('image/')) {
+                        e.preventDefault();
+                        const f = item.getAsFile();
+                        if (f.size > 10 * 1024 * 1024) { showToast('Файл >10MB', 'error'); return; }
+                        const r = new FileReader();
+                        r.onload = ev => insertText('![image](' + ev.target.result + ')');
+                        r.readAsDataURL(f);
+                        break;
+                    }
+                }
+            });
+
+            document.querySelectorAll('[data-md]').forEach(b => b.onclick = () => {
+                const cmd = {
+                    bold: () => insertAround('**', '**', 'жирный'),
+                    italic: () => insertAround('*', '*', 'курсив'),
+                    underline: () => insertAround('_', '_', 'подчёркнутый'),
+                    strike: () => insertAround('~~', '~~', 'зачёркнуто'),
+                    h1: () => insertLinePrefix('# '),
+                    h2: () => insertLinePrefix('## '),
+                    h3: () => insertLinePrefix('### '),
+                    ul: () => insertLinePrefix('- '),
+                    ol: () => insertLinePrefix('1. '),
+                    task: () => insertLinePrefix('- [ ] '),
+                    link: () => { const u = prompt('URL:'); if (u) insertAround('[', '](' + u + ')',
+                            'текст'); },
+                    image: () => { const u = prompt('URL изображения:'); if (u) insertText('![' + u +
+                            '](' + u + ')'); },
+                    code: () => insertAround('`', '`', 'код'),
+                    quote: () => insertLinePrefix('> '),
+                    table: () => insertText('\n| A | B |\n|---|---|\n| 1 | 2 |\n'),
+                    hr: () => insertText('\n---\n')
+                };
+                cmd[b.dataset.md]?.();
+            });
+
+            document.addEventListener('keydown', e => {
+                const c = e.ctrlKey || e.metaKey;
+                if (c && e.key === 'z') { e.preventDefault();
+                    undo(); }
+                if (c && e.key === 'y') { e.preventDefault();
+                    redo(); }
+                if (c && e.key === 'b') { e.preventDefault();
+                    insertAround('**', '**', 'жирный'); }
+                if (c && e.key === 'i') { e.preventDefault();
+                    insertAround('*', '*', 'курсив'); }
+                if (c && e.key === 'k') { e.preventDefault();
+                    const u = prompt('URL:'); if (u) insertAround('[', '](' + u + ')', 'текст'); }
+                if (c && e.key === 's') { e.preventDefault();
+                    $('saveBtn').click(); }
+                if (c && e.key === 'f') { e.preventDefault();
+                    openSearch(); }
+                if (c && e.key === 'n') { e.preventDefault(); if (confirm('Новый документ?')) { editor.value =
+                            '';
+                        state.undoStack = [''];
+                        state.redoStack = [];
+                        render(); } }
+                if (c && e.key === 'o') { e.preventDefault();
+                    $('fileOpener').click(); }
+                if (e.key === 'F1') { e.preventDefault();
+                    showGuide(); }
+                if (e.key === 'Escape') {
+                    stopVoice();
+                    closeSearch();
+                }
+            });
+
+            $('newBtn').onclick = () => { if (confirm('Новый?')) { editor.value = '';
+                    state.undoStack = [''];
+                    state.redoStack = [];
+                    render(); } };
+            $('openBtn').onclick = () => $('fileOpener').click();
+            $('saveBtn').onclick = () => {
+                const b = new Blob([editor.value], { type: 'text/plain' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(b);
+                a.download = $('fileName').value;
+                a.click();
+                showToast('💾 Сохранено');
+            };
+            $('undoBtn').onclick = undo;
+            $('redoBtn').onclick = redo;
+            $('searchBtn').onclick = () => openSearch();
+            $('templatesBtn').onclick = () => { renderTemplates();
+                $('templatesModal').classList.add('show'); };
+            $('themeBtn').onclick = () => {
+                const next = state.theme === 'dark' ? 'light' : state.theme === 'light' ? 'sepia' : 'dark';
+                setTheme(next);
+                showToast('Тема: ' + (next === 'dark' ? 'Тёмная' : next === 'sepia' ? 'Сепия' : 'Светлая'));
+            };
+            $('menuBtn').onclick = () => $('menuModal').classList.add('show');
+            $('aiSettingsBtn').onclick = () => { $('deepseekApiKey').value = state.deepseekApiKey;
+                $('aiSettingsModal').classList.add('show'); };
+            $('voiceBtn').onclick = () => { isListening ? stopVoice() : startVoice(); };
+
+            $('searchCloseBtn').onclick = closeSearch;
+            $('searchPrevBtn').onclick = searchPrev;
+            $('searchNextBtn').onclick = searchNext;
+            $('searchInput').oninput = performSearch;
+            $('searchInput').onkeydown = e => {
+                if (e.key === 'Enter') { e.preventDefault();
+                    e.shiftKey ? searchPrev() : searchNext(); }
+                if (e.key === 'Escape') closeSearch();
+            };
+
+            $('fileOpener').onchange = e => {
+                const f = e.target.files[0];
+                if (f) {
+                    const r = new FileReader();
+                    r.onload = ev => { editor.value = ev.target.result;
+                        $('fileName').value = f.name;
+                        state.undoStack = [ev.target.result];
+                        state.redoStack = [];
+                        render(); };
+                    r.readAsText(f);
+                }
+            };
+
+            document.querySelectorAll('.modal').forEach(m => m.onclick = e => { if (e.target === m) m.classList.remove(
+                    'show'); });
+
+            const draft = localStorage.getItem('mf_draft');
+            editor.value = draft || '# ✨ MarkFlow Pro v7.2\n\n**Новое:** 🎨 Сепия · 🎤 Голосовой ввод · 🤖 DeepSeek AI · 🔧 Фикс скролла\n\n> 💡 Нажмите F1 для справки';
+            state.undoStack = [editor.value];
+            render();
+            if (!localStorage.getItem('mf_visited_v72')) { setTimeout(showGuide, 800);
+                localStorage.setItem('mf_visited_v72', '1'); }
+        }
+
+        let searchResults = [],
+            searchIndex = 0;
+
+        function openSearch() {
+            $('searchBar').classList.add('active');
+            $('searchInput').focus();
+            performSearch();
+        }
+
+        function closeSearch() { $('searchBar').classList.remove('active');
+            searchResults = [];
+            $('searchCount').textContent = ''; }
+
+        function performSearch() {
+            const q = $('searchInput').value;
+            if (!q) { $('searchCount').textContent = ''; return; }
+            const regex = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+            searchResults = [...editor.value.matchAll(regex)].map(m => m.index);
+            searchIndex = Math.min(searchIndex, searchResults.length - 1);
+            $('searchCount').textContent = searchResults.length ? `${searchIndex+1}/${searchResults.length}` : 'Нет';
+            if (searchResults.length) { editor.focus();
+                editor.setSelectionRange(searchResults[searchIndex], searchResults[searchIndex] + q.length); }
+        }
+
+        function searchNext() {
+            if (!searchResults.length) return;
+            searchIndex = (searchIndex + 1) % searchResults.length;
+            editor.focus();
+            editor.setSelectionRange(searchResults[searchIndex], searchResults[searchIndex] + $('searchInput').value.length);
+            $('searchCount').textContent = `${searchIndex+1}/${searchResults.length}`;
+        }
+
+        function searchPrev() {
+            if (!searchResults.length) return;
+            searchIndex = (searchIndex - 1 + searchResults.length) % searchResults.length;
+            editor.focus();
+            editor.setSelectionRange(searchResults[searchIndex], searchResults[searchIndex] + $('searchInput').value.length);
+            $('searchCount').textContent = `${searchIndex+1}/${searchResults.length}`;
+        }
+
+        init();
+        showToast('🚀 MarkFlow Pro v7.2 FINAL готов');
+    </script>
+</body>
+</html>

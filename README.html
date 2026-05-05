@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarkFlow Pro v7.2 — Документация</title>
+    <style>
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: #14141f;
+            --border: #2d2d44;
+            --text: #e8e8f0;
+            --text-dim: #8a8aa8;
+            --accent: #7c3aed;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            line-height: 1.7;
+            padding: 20px;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        h1 {
+            font-size: 2.5em;
+            background: linear-gradient(135deg, #7c3aed, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+        h2 {
+            border-left: 4px solid var(--accent);
+            padding-left: 16px;
+            margin: 32px 0 16px;
+            font-size: 1.6em;
+        }
+        h3 {
+            color: var(--accent);
+            margin: 20px 0 10px;
+            font-size: 1.2em;
+        }
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-right: 8px;
+        }
+        .badge-success {
+            background: var(--success);
+            color: #000;
+        }
+        .badge-warning {
+            background: var(--warning);
+            color: #000;
+        }
+        .badge-accent {
+            background: var(--accent);
+            color: #fff;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin: 16px 0;
+        }
+        .feature-item {
+            background: rgba(124, 58, 237, 0.1);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+        }
+        .feature-item .icon {
+            font-size: 2em;
+            display: block;
+            margin-bottom: 8px;
+        }
+        kbd {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+        th,
+        td {
+            border: 1px solid var(--border);
+            padding: 10px 16px;
+            text-align: left;
+        }
+        th {
+            background: var(--bg-card);
+            color: var(--accent);
+        }
+        code {
+            background: var(--bg-card);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            color: var(--warning);
+        }
+        pre {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            overflow-x: auto;
+        }
+        ul,
+        ol {
+            padding-left: 24px;
+        }
+        li {
+            margin: 6px 0;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid var(--border);
+            margin: 32px 0;
+        }
+        .footer {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9em;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>✍️ MarkFlow Pro v7.2</h1>
+    <p style="font-size:1.1em; color: var(--text-dim);">
+        Профессиональный Markdown-редактор с AI-помощником, голосовым вводом и тремя темами оформления.
+        <br>
+        <span class="badge badge-accent">v7.2 FINAL</span>
+        <span class="badge badge-success">Бесплатно</span>
+        <span class="badge badge-warning">Проприетарная лицензия</span>
+    </p>
+
+    <div class="card">
+        <h2>🚀 Что нового в v7.2</h2>
+        <div class="feature-grid">
+            <div class="feature-item">
+                <span class="icon">🎨</span>
+                <strong>Тема «Сепия»</strong>
+                <p style="font-size:0.85em; color:var(--text-dim);">Тёплая тема для комфортного чтения</p>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🎤</span>
+                <strong>Голосовой ввод</strong>
+                <p style="font-size:0.85em; color:var(--text-dim);">Работает как рация, без дублей</p>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🤖</span>
+                <strong>DeepSeek AI</strong>
+                <p style="font-size:0.85em; color:var(--text-dim);">Перевод, правки, SQL, RegEx</p>
+            </div>
+            <div class="feature-item">
+                <span class="icon">🔧</span>
+                <strong>Фикс скролла</strong>
+                <p style="font-size:0.85em; color:var(--text-dim);">Синхронный скролл без зависаний</p>
+            </div>
+        </div>
+    </div>
+
+    <h2>📋 Возможности</h2>
+    <ul>
+        <li><strong>📝 Полноценный Markdown-редактор</strong> — все стандартные элементы разметки</li>
+        <li><strong>👁️ Живой предпросмотр</strong> — с синхронным скроллом (исправлен в v7.2)</li>
+        <li><strong>🎤 Голосовой ввод</strong> — диктовка текста без дублирования (Web Speech API)</li>
+        <li><strong>🤖 AI-помощник (DeepSeek)</strong> — проверка орфографии, перевод, улучшение стиля, SQL, RegEx</li>
+        <li><strong>🎨 Три темы оформления</strong> — тёмная, светлая, сепия</li>
+        <li><strong>📥 Экспорт</strong> — PDF (печать), CSV, HTML</li>
+        <li><strong>🔍 Поиск по тексту</strong> — с навигацией</li>
+        <li><strong>📋 Шаблоны документов</strong> — статья, отчёт, TODO, баг-репорт и др.</li>
+        <li><strong>💡 Сниппеты</strong> — быстрая вставка блоков (важно, совет, код и др.)</li>
+        <li><strong>↩️ Отмена/повтор действий</strong> (Undo/Redo)</li>
+        <li><strong>🖼️ Вставка изображений</strong> — из буфера обмена (в т.ч. Base64)</li>
+        <li><strong>📊 Статистика</strong> — символы, слова, строки, время чтения</li>
+        <li><strong>⌨️ Горячие клавиши</strong> — ускоряют работу</li>
+    </ul>
+
+    <h2>⌨️ Горячие клавиши</h2>
+    <table>
+        <tr><th>Действие</th><th>Сочетание</th></tr>
+        <tr><td>Жирный</td><td><kbd>Ctrl</kbd> + <kbd>B</kbd></td></tr>
+        <tr><td>Курсив</td><td><kbd>Ctrl</kbd> + <kbd>I</kbd></td></tr>
+        <tr><td>Вставить ссылку</td><td><kbd>Ctrl</kbd> + <kbd>K</kbd></td></tr>
+        <tr><td>Сохранить</td><td><kbd>Ctrl</kbd> + <kbd>S</kbd></td></tr>
+        <tr><td>Отменить</td><td><kbd>Ctrl</kbd> + <kbd>Z</kbd></td></tr>
+        <tr><td>Повторить</td><td><kbd>Ctrl</kbd> + <kbd>Y</kbd></td></tr>
+        <tr><td>Поиск</td><td><kbd>Ctrl</kbd> + <kbd>F</kbd></td></tr>
+        <tr><td>Новый документ</td><td><kbd>Ctrl</kbd> + <kbd>N</kbd></td></tr>
+        <tr><td>Открыть файл</td><td><kbd>Ctrl</kbd> + <kbd>O</kbd></td></tr>
+        <tr><td>Справка</td><td><kbd>F1</kbd></td></tr>
+        <tr><td>Закрыть поиск / Голос</td><td><kbd>Esc</kbd></td></tr>
+    </table>
+
+    <h2>🤖 AI-функции (DeepSeek)</h2>
+    <p>
+        Для работы AI-помощника требуется <strong>API-ключ DeepSeek</strong>.
+        Получите его на <a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a>
+        и вставьте в настройках приложения (⚡).
+    </p>
+    <table>
+        <tr><th>Функция</th><th>Описание</th></tr>
+        <tr><td>🔍 Проверить орфографию</td><td>Находит ошибки в тексте</td></tr>
+        <tr><td>🌐 Перевести</td><td>Перевод на английский / русский</td></tr>
+        <tr><td>📝 Суммаризировать</td><td>Краткое содержание текста</td></tr>
+        <tr><td>✨ Улучшить стиль</td><td>Делает текст выразительнее</td></tr>
+        <tr><td>📊 Текст в SQL</td><td>Генерация SQL на основе описания</td></tr>
+        <tr><td>🎯 Текст в RegEx</td><td>Генерация регулярного выражения</td></tr>
+        <tr><td>💡 Объяснить код</td><td>Поясняет, что делает код</td></tr>
+        <tr><td>🔧 Исправить код</td><td>Ищет и исправляет ошибки</td></tr>
+    </table>
+
+    <h2>🗂️ Структура проекта</h2>
+    <pre>
+MarkFlow-Pro-v7.2/
+├── MarkFlow Pro v7-2.html    ← Основной файл приложения
+├── README.html               ← Документация (этот файл)
+├── LICENSE.md                ← Лицензия
+    </pre>
+    <p style="color: var(--text-dim); font-size: 0.9em;">
+        Приложение полностью самодостаточно и работает в одном HTML-файле.
+        Откройте его в любом современном браузере.
+    </p>
+
+    <h2>🔧 Используемые библиотеки (CDN)</h2>
+    <ul>
+        <li><strong>marked</strong> — парсинг Markdown</li>
+        <li><strong>highlight.js</strong> — подсветка синтаксиса кода</li>
+        <li><strong>DOMPurify</strong> — санитизация HTML (безопасность)</li>
+    </ul>
+
+    <h2>📜 Лицензия</h2>
+    <p>
+        Проект распространяется под <strong>проприетарной лицензией</strong>.
+        Подробнее в файле <a href="LICENSE.md">LICENSE.md</a>.
+    </p>
+    <div class="card" style="border-left: 4px solid var(--success);">
+        <p style="margin:0;">
+            <strong>Суть лицензии:</strong> Вы можете свободно использовать программу для личных нужд,
+            делиться с друзьями и сообществом <strong>бесплатно</strong>.
+            <br>
+            <strong>Запрещено:</strong> продавать, сдавать в аренду, монетизировать любым способом.
+        </p>
+    </div>
+
+    <hr>
+
+    <div class="footer">
+        <p>© 2026 MarkFlow Pro v7.2. Сделано с ❤️ для сообщества.</p>
+        <p>📧 <a href="mailto:msd-express@yandex.ru">msd-express@yandex.ru</a></p>
+    </div>
+
+</body>
+</html>
